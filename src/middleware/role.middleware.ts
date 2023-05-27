@@ -8,7 +8,7 @@ const roleMiddleware = (roles: string[] = []) => {
             return roles.includes(role.name);
         });
         if (roles.length > 0 && userRoles.length === 0) {
-            const error: HandlerError = new HandlerError('Não autorizado.', 401);
+            const error: HandlerError = new HandlerError("Não autorizado.", 401);
             return next(error);
         }
         return next();

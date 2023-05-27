@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { database } from "../database";
 import { UserModel } from "./user.model";
 
-export const UserRoleModel = database.define('tb_user_role', {
+export const UserRoleModel = database.define("tb_user_role", {
     id: {
         type: DataTypes.BIGINT, autoIncrement: true, allowNull: false, primaryKey: true,
     }, name: {
@@ -11,13 +11,13 @@ export const UserRoleModel = database.define('tb_user_role', {
     userId: {
         type: DataTypes.BIGINT,
         allowNull: false,
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
         references: {
             model: UserModel,
-            key: 'id',
+            key: "id",
         },
-        field: 'user_id',
+        field: "user_id",
     },
 }, {
-    freezeTableName: true, createdAt: 'created_at', updatedAt: 'updated_at',
+    freezeTableName: true, createdAt: "created_at", updatedAt: "updated_at",
 });

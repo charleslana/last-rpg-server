@@ -5,8 +5,8 @@ export const userCreateMiddleware = () => {
         [Segments.BODY]: {
             email: Joi.string().email().trim().max(50).required(),
             password: Joi.string().required().min(6).max(50), passwordConfirmation: Joi.string()
-                .valid(Joi.ref('password'))
-                .when('password', {
+                .valid(Joi.ref("password"))
+                .when("password", {
                     is: Joi.exist(), then: Joi.required(),
                 }),
             name: Joi.string()

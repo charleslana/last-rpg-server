@@ -35,7 +35,7 @@ export default class UserService {
             }, attributes: { exclude: ["password", "authToken"] }, include: [
                 {
                     model: UserRoleModel,
-                    as: 'roles',
+                    as: "roles",
                 },
             ],
         })) as unknown as IUser;
@@ -53,7 +53,7 @@ export default class UserService {
             include: [
                 {
                     model: UserRoleModel,
-                    as: 'roles',
+                    as: "roles",
                 },
             ],
         })) as unknown as IUser;

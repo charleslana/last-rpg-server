@@ -23,7 +23,7 @@ app.use(rateLimit({
     max: 100,
     standardHeaders: true,
     legacyHeaders: false,
-    message: 'Too many requests from this IP, please try again after 5 minutes',
+    message: "Too many requests from this IP, please try again after 5 minutes",
 }));
 
 app.use(routes);
@@ -34,7 +34,7 @@ app.use(errorMiddleware);
 
 app.use((request: Request, response: Response) => {
     logger.info(`Route ${request.url} not found`);
-    return new HandlerSuccess('Rota não encontrada', 404).toJSON(response);
+    return new HandlerSuccess("Rota não encontrada", 404).toJSON(response);
 });
 
 const port = process.env.PORT || 5000;
