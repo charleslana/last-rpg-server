@@ -12,6 +12,6 @@ publicRoute.route('/version').get(PublicController.getServerVersion);
 
 publicRoute.route('/user').post(userCreateMiddleware(), UserController.create);
 
-publicRoute.route('/auth').post(userLoginMiddleware(), UserController.login);
+publicRoute.route('/auth').post(userLoginMiddleware(), UserController.auth);
 
 export default publicRoute;

@@ -127,6 +127,8 @@ export default class UserService {
       expiresIn: '1d',
     });
     return {
+      error: false,
+      message: 'Autenticado com sucesso.',
       accessToken: token,
     };
   }

@@ -50,7 +50,7 @@ export default class UserController {
     }
   }
 
-  public static async login(
+  public static async auth(
     request: Request,
     response: Response,
     next: NextFunction
