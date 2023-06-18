@@ -1,3 +1,3 @@
 export default interface IUserAuthenticate {
-    accessToken: string;
+  accessToken: string;
 }
