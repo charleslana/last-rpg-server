@@ -4,7 +4,9 @@ export const userCreateMiddleware = () => {
   return celebrate(
     {
       [Segments.BODY]: {
-        email: Joi.string().email().trim().max(50).required(),
+        email: Joi.string().email().trim().max(50).required().messages({
+          'string.email': 'O campo {{#label}} deve conter um e-mail válido.',
+        }),
         password: Joi.string().required().min(6).max(50),
         passwordConfirmation: Joi.string()
           .valid(Joi.ref('password'))

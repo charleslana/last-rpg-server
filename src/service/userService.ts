@@ -3,8 +3,10 @@ import HandlerError from '../handler/handlerError';
 import HandlerSuccess from '../handler/handlerSuccess';
 import IUser from '../interface/userInterface';
 import IUserAuthenticate from '../interface/userAuthenticateInterface';
+import IUserCharacter from '../interface/userCharacterInterface';
 import jwt from 'jsonwebtoken';
 import sequelize, { Optional } from 'sequelize';
+import UserCharacterService from './userCharacterService';
 import { formatDate, randomString } from '../utils/utils';
 import { UserModel } from '../database/model/userModel';
 import { UserRoleModel } from '../database/model/userRoleModel';
@@ -21,7 +23,12 @@ export default class UserService {
       throw new HandlerError('E-mail já cadastrado.');
     }
     i.password = this.encrypt(i.password as string);
-    await UserModel.create(i as Optional<unknown, never>);
+    const insert = (await UserModel.create(
+      i as Optional<unknown, never>
+    )) as unknown as IUserCharacter;
+    for (let index = 1; index <= 2; index++) {
+      await UserCharacterService.save(insert.id, index);
+    }
     return new HandlerSuccess('Usuário criado com sucesso.', 201);
   }
 
@@ -39,7 +46,7 @@ export default class UserService {
       ],
     })) as unknown as IUser;
     if (!find) {
-      throw new HandlerError('Conta não encontrada.', 404);
+      throw new HandlerError('Usuário não encontrado.', 404);
     }
     return find;
   }
