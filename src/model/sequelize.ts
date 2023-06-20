@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-export const database = new Sequelize(
+export const sequelize = new Sequelize(
   process.env.DATABASE_NAME as string,
   process.env.DATABASE_USER as string,
   process.env.DATABASE_PASSWORD,

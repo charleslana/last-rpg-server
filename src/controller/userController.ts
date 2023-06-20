@@ -1,5 +1,5 @@
-import IUser from '../interface/userInterface';
 import logger from '../utils/logger';
+import UserModel from '../model/userModel';
 import UserService from '../service/userService';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,7 +11,7 @@ export default class UserController {
   ) {
     logger.info(`Create user ${JSON.stringify(request.body)}`);
     try {
-      const user = request.body as IUser;
+      const user = request.body as UserModel;
       const handler = await UserService.save(user);
       return handler.toJSON(response);
     } catch (error) {
@@ -27,7 +27,7 @@ export default class UserController {
     logger.info(`Update user name with ${JSON.stringify(request.body)}`);
     try {
       const { name } = request.body;
-      const i = <IUser>{};
+      const i = <UserModel>{};
       i.id = request.user.id;
       i.name = name;
       const handler = await UserService.updateName(i);

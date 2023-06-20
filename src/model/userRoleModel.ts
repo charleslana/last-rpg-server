@@ -1,9 +1,14 @@
-import { database } from '../database';
-import { DataTypes } from 'sequelize';
-import { UserModel } from './userModel';
+import UserModel from './userModel';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from './sequelize';
 
-export const UserRoleModel = database.define(
-  'tb_user_role',
+export default class UserRoleModel extends Model {
+  public id!: string;
+  public name!: string;
+  public userId!: string;
+}
+
+UserRoleModel.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -27,6 +32,8 @@ export const UserRoleModel = database.define(
     },
   },
   {
+    sequelize,
+    tableName: 'tb_user_role',
     freezeTableName: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',

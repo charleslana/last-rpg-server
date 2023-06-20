@@ -7,8 +7,8 @@ import helmet from 'helmet';
 import logger from './utils/logger';
 import rateLimit from 'express-rate-limit';
 import routes from './routes';
-import { database } from './database/database';
 import { errors } from 'celebrate';
+import { sequelize } from './model/sequelize';
 
 const app = express();
 
@@ -42,7 +42,7 @@ app.use((request: Request, response: Response) => {
 const port = process.env.PORT || 5000;
 
 app.listen(port, async () => {
-  await database.sync();
+  await sequelize.sync();
   CronJobService.start();
   console.log(`Started on port ${port}`);
 });

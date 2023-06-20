@@ -1,10 +1,24 @@
-import { CharacterModel } from './characterModel';
-import { database } from '../database';
-import { DataTypes } from 'sequelize';
-import { UserModel } from './userModel';
+import CharacterModel from './characterModel';
+import UserModel from './userModel';
+import { DataTypes, HasOneGetAssociationMixin, Model } from 'sequelize';
+import { sequelize } from './sequelize';
 
-export const UserCharacterModel = database.define(
-  'tb_user_character',
+export default class UserCharacterModel extends Model {
+  public id!: string;
+  public experience!: string;
+  public level!: number;
+  public upgrade!: number;
+  public minHp!: number;
+  public slot!: number | null;
+  public userId!: string;
+  public characterId!: string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+  public readonly character!: CharacterModel;
+  public getCharacter!: HasOneGetAssociationMixin<CharacterModel>;
+}
+
+UserCharacterModel.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -27,9 +41,10 @@ export const UserCharacterModel = database.define(
       allowNull: false,
       defaultValue: 0,
     },
-    hp: {
+    minHp: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'min_hp',
     },
     slot: {
       type: DataTypes.INTEGER,
@@ -56,6 +71,8 @@ export const UserCharacterModel = database.define(
     },
   },
   {
+    sequelize,
+    tableName: 'tb_user_character',
     freezeTableName: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
@@ -65,5 +82,4 @@ export const UserCharacterModel = database.define(
 UserCharacterModel.belongsTo(CharacterModel, {
   as: 'character',
   foreignKey: 'characterId',
-  targetKey: 'id',
 });

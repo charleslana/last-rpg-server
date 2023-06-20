@@ -1,10 +1,10 @@
 declare namespace Express {
-  import IUserRole from '../../interface/user.role.interface';
+  import UserRoleModel from '../../model/userRoleModel';
 
   export interface Request {
     user: {
-      id: number;
-      roles: IUserRole[];
+      id: string;
+      roles: UserRoleModel[];
     };
   }
 }

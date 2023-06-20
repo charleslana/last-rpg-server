@@ -1,8 +1,8 @@
-import IUser from '../interface/userInterface';
+import UserModel from '../model/userModel';
 
 type DecodeType = {
   iat: number;
-  user: IUser;
+  user: UserModel;
 };
 
 export default DecodeType;

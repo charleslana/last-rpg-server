@@ -1,16 +1,17 @@
+import CharacterModel from '../model/characterModel';
 import CharacterService from './characterService';
 import HandlerError from '../handler/handlerError';
 import HandlerSuccess from '../handler/handlerSuccess';
-import IUserCharacter from '../interface/userCharacterInterface';
 import IUserCharacterSlot from '../interface/userCharacterSlotInterface';
+import UserCharacterModel from '../model/userCharacterModel';
 import UserService from './userService';
-import { CharacterModel } from '../database/model/characterModel';
-import { UserCharacterModel } from '../database/model/userCharacterModel';
+import { Sequelize } from 'sequelize';
 
 export default class UserCharacterService {
   public static async save(
-    userId: number,
-    characterId: number
+    userId: string,
+    characterId: string,
+    slot?: number
   ): Promise<HandlerSuccess> {
     await UserService.get(userId);
     const character = await CharacterService.getCharacterById(characterId);
@@ -18,31 +19,71 @@ export default class UserCharacterService {
     await UserCharacterModel.create({
       userId: userId,
       characterId: characterId,
-      hp: character.hp,
+      minHp: character.hp,
+      slot: slot,
     });
     return new HandlerSuccess('Personagem do usuário criado com sucesso', 201);
   }
 
-  public static async getAll(userId: number): Promise<IUserCharacter[]> {
-    return (await UserCharacterModel.findAll({
+  public static async getAll(userId: string): Promise<UserCharacterModel[]> {
+    return await UserCharacterModel.findAll({
       where: {
         userId: userId,
       },
+      order: [
+        ['slot', 'ASC'],
+        ['id', 'DESC'],
+      ],
+      attributes: [
+        'id',
+        'experience',
+        'level',
+        'upgrade',
+        'minHp',
+        [
+          Sequelize.literal('COALESCE(min_hp, 0) * COALESCE(level, 0)'),
+          'maxHp',
+        ],
+        'slot',
+        'userId',
+        'characterId',
+        [Sequelize.col('created_at'), 'createdAt'],
+        [Sequelize.col('updated_at'), 'updatedAt'],
+      ],
       include: [
         {
           model: CharacterModel,
           as: 'character',
         },
       ],
-    })) as unknown as IUserCharacter[];
+    });
   }
 
-  public static async get(id: number, userId: number): Promise<IUserCharacter> {
+  public static async get(
+    id: string,
+    userId: string
+  ): Promise<UserCharacterModel> {
     const exist = await UserCharacterModel.findOne({
       where: {
         id: id,
         userId: userId,
       },
+      attributes: [
+        'id',
+        'experience',
+        'level',
+        'upgrade',
+        'minHp',
+        [
+          Sequelize.literal('COALESCE(min_hp, 0) * COALESCE(level, 0)'),
+          'maxHp',
+        ],
+        'slot',
+        'userId',
+        'characterId',
+        [Sequelize.col('created_at'), 'createdAt'],
+        [Sequelize.col('updated_at'), 'updatedAt'],
+      ],
       include: [
         {
           model: CharacterModel,
@@ -53,12 +94,12 @@ export default class UserCharacterService {
     if (!exist) {
       throw new HandlerError('Personagem do usuário não encontrado', 404);
     }
-    return exist as unknown as IUserCharacter;
+    return exist;
   }
 
   public static async existUserCharacterByUserId(
-    userId?: number,
-    characterId?: number
+    userId: string,
+    characterId: string
   ): Promise<void> {
     const count = await UserCharacterModel.count({
       where: {
@@ -77,16 +118,12 @@ export default class UserCharacterService {
     await UserService.get(userCharacterSlot.userId);
     await this.clearSlot(userCharacterSlot.userId);
     for (const i of userCharacterSlot.characters) {
-      await UserCharacterService.updateSlot(
-        userCharacterSlot.userId,
-        i.characterId,
-        i.slot
-      );
+      await this.updateSlot(userCharacterSlot.userId, i.characterId, i.slot);
     }
     return new HandlerSuccess('Slot do personagem atualizado com sucesso.');
   }
 
-  private static async clearSlot(userId: number): Promise<void> {
+  private static async clearSlot(userId: string): Promise<void> {
     await UserCharacterModel.update(
       {
         slot: null,
@@ -100,8 +137,8 @@ export default class UserCharacterService {
   }
 
   private static async updateSlot(
-    userId: number,
-    characterId: number,
+    userId: string,
+    characterId: string,
     slot: number
   ): Promise<void> {
     const userCharacter = await this.get(characterId, userId);

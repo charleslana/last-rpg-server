@@ -1,81 +1,79 @@
 import bcrypt from 'bcrypt';
 import HandlerError from '../handler/handlerError';
 import HandlerSuccess from '../handler/handlerSuccess';
-import IUser from '../interface/userInterface';
 import IUserAuthenticate from '../interface/userAuthenticateInterface';
-import IUserCharacter from '../interface/userCharacterInterface';
 import jwt from 'jsonwebtoken';
 import sequelize, { Optional } from 'sequelize';
 import UserCharacterService from './userCharacterService';
+import UserModel from '../model/userModel';
+import UserRoleModel from '../model/userRoleModel';
 import { formatDate, randomString } from '../utils/utils';
-import { UserModel } from '../database/model/userModel';
-import { UserRoleModel } from '../database/model/userRoleModel';
 
 export default class UserService {
-  public static async save(i: IUser): Promise<HandlerSuccess> {
+  public static async save(model: UserModel): Promise<HandlerSuccess> {
     const count = await UserModel.count({
       where: sequelize.where(
         sequelize.fn('lower', sequelize.col('email')),
-        sequelize.fn('lower', i.email)
+        sequelize.fn('lower', model.email)
       ),
     });
     if (count) {
       throw new HandlerError('E-mail já cadastrado.');
     }
-    i.password = this.encrypt(i.password as string);
-    const insert = (await UserModel.create(
-      i as Optional<unknown, never>
-    )) as unknown as IUserCharacter;
-    for (let index = 1; index <= 2; index++) {
-      await UserCharacterService.save(insert.id, index);
+    model.password = this.encrypt(model.password as string);
+    const insert = await UserModel.create(model as Optional<unknown, never>);
+    for (let index = 1; index <= 3; index++) {
+      await UserCharacterService.save(insert.id, index.toString(), index);
     }
     return new HandlerSuccess('Usuário criado com sucesso.', 201);
   }
 
-  public static async get(id: number): Promise<IUser> {
-    const find = (await UserModel.findOne({
+  public static async get(id: string): Promise<UserModel> {
+    const find = await UserModel.findOne({
       where: {
         id: id,
       },
-      attributes: { exclude: ['password', 'authToken'] },
+      attributes: {
+        exclude: ['password', 'authToken'],
+      },
       include: [
         {
           model: UserRoleModel,
           as: 'roles',
         },
       ],
-    })) as unknown as IUser;
+    });
     if (!find) {
       throw new HandlerError('Usuário não encontrado.', 404);
     }
     return find;
   }
 
-  public static async updateName(i: IUser): Promise<HandlerSuccess> {
-    const find = await this.get(i.id);
+  public static async updateName(model: UserModel): Promise<HandlerSuccess> {
+    const find = await this.get(model.id);
     if (find.name != null) {
       throw new HandlerError('Você já atualizou seu nome.', 400);
     }
-    const exist = (await UserModel.findOne({
+    const exist = await UserModel.findOne({
       where: sequelize.where(
         sequelize.fn('lower', sequelize.col('name')),
-        sequelize.fn('lower', i.name)
+        sequelize.fn('lower', model.name)
       ),
-    })) as unknown as IUser;
+    });
     if (
       exist &&
-      exist.name?.toLowerCase() === i.name?.toLowerCase() &&
-      exist.id !== i.id
+      exist.name?.toLowerCase() === model.name?.toLowerCase() &&
+      exist.id !== model.id
     ) {
       throw new HandlerError('Nome já cadastrado.', 400);
     }
     await UserModel.update(
       {
-        name: i.name,
+        name: model.name,
       },
       {
         where: {
-          id: i.id,
+          id: model.id,
         },
       }
     );
@@ -86,7 +84,7 @@ export default class UserService {
     email: string,
     password: string
   ): Promise<IUserAuthenticate> {
-    const find = (await UserModel.findOne({
+    const find = await UserModel.findOne({
       attributes: ['id', 'email', 'password', 'banned'],
       where: {
         email: email,
@@ -97,7 +95,7 @@ export default class UserService {
           as: 'roles',
         },
       ],
-    })) as unknown as IUser;
+    });
     if (!find) {
       throw new HandlerError(
         'Impossível acessar, verifique e tente novamente.',
@@ -141,15 +139,15 @@ export default class UserService {
   }
 
   public static async getAuth(
-    id: number,
+    id: string,
     authToken: string | null
-  ): Promise<IUser> {
-    return (await UserModel.findOne({
+  ): Promise<UserModel | null> {
+    return await UserModel.findOne({
       where: {
         id: id,
         authToken: authToken,
       },
-    })) as unknown as IUser;
+    });
   }
 
   private static encrypt(password: string): string {

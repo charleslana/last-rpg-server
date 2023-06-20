@@ -43,7 +43,7 @@ export default class UserCharacterController {
       const { id } = request.params;
       return response
         .status(200)
-        .json(await UserCharacterService.get(+id, request.user.id));
+        .json(await UserCharacterService.get(id, request.user.id));
     } catch (error) {
       next(error);
     }

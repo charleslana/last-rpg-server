@@ -1,10 +1,26 @@
-import CharacterClassEnum from '../../enum/characterClassEnum';
-import RarityEnum from '../../enum/rarityEnum';
-import { database } from '../database';
-import { DataTypes } from 'sequelize';
+import CharacterClassEnum from '../enum/characterClassEnum';
+import RarityEnum from '../enum/rarityEnum';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from './sequelize';
 
-export const CharacterModel = database.define(
-  'tb_character',
+export default class CharacterModel extends Model {
+  public id!: string;
+  public name!: string;
+  public characterClass!: CharacterClassEnum;
+  public hp!: number;
+  public furyHit!: number;
+  public furyDefense!: number;
+  public attack!: number | null;
+  public magicAttack!: number | null;
+  public defense!: number | null;
+  public magicDefense!: number | null;
+  public agility!: number;
+  public critical!: number | null;
+  public dodge!: number | null;
+  public rarity!: RarityEnum;
+}
+
+CharacterModel.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -66,6 +82,8 @@ export const CharacterModel = database.define(
     },
   },
   {
+    sequelize,
+    tableName: 'tb_character',
     freezeTableName: true,
     timestamps: false,
   }

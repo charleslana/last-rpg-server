@@ -28,7 +28,7 @@ const authenticateMiddleware = async (
             return handleUnauthorizedError(next);
           }
           request.user = {
-            id: user.id as number,
+            id: user.id,
             roles: user.roles,
           };
           return next();

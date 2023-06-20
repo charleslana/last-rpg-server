@@ -1,9 +1,9 @@
 export default interface IUserCharacterSlot {
-  userId: number;
+  userId: string;
   characters: ICharacterSlot[];
 }
 
 export interface ICharacterSlot {
-  characterId: number;
+  characterId: string;
   slot: number;
 }
