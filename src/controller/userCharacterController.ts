@@ -56,10 +56,9 @@ export default class UserCharacterController {
   ) {
     logger.info(`Update user character slot ${JSON.stringify(request.body)}`);
     try {
-      const { characters } = request.body;
       const handler = await UserCharacterService.updateAllSlot({
         userId: request.user.id,
-        characters: characters,
+        characters: request.body,
       });
       return handler.toJSON(response);
     } catch (error) {
