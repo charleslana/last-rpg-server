@@ -7,6 +7,7 @@ import UserCharacterModel from '../model/userCharacterModel';
 import UserService from './userService';
 import CharacterSkillModel from '../model/characterSkillModel';
 import SkillModel from '../model/skillModel';
+import CharacterSkillService from './characterSkillService';
 
 export default class UserCharacterService {
   public static async save(
@@ -17,12 +18,13 @@ export default class UserCharacterService {
     await UserService.get(userId);
     const character = await CharacterService.getCharacterById(characterId);
     await this.existUserCharacterByUserId(userId, characterId);
-    await UserCharacterModel.create({
+    const insert = await UserCharacterModel.create({
       userId: userId,
       characterId: characterId,
       minHp: character.hp,
       slot: slot,
     });
+    await CharacterSkillService.save(userId, insert.id, '1');
     return new HandlerSuccess('Personagem do usuário criado com sucesso', 201);
   }
 
