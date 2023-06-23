@@ -5,7 +5,8 @@ import HandlerSuccess from '../handler/handlerSuccess';
 import IUserCharacterSlot from '../interface/userCharacterSlotInterface';
 import UserCharacterModel from '../model/userCharacterModel';
 import UserService from './userService';
-import { Sequelize } from 'sequelize';
+import CharacterSkillModel from '../model/characterSkillModel';
+import SkillModel from '../model/skillModel';
 
 export default class UserCharacterService {
   public static async save(
@@ -34,26 +35,20 @@ export default class UserCharacterService {
         ['slot', 'ASC'],
         ['id', 'DESC'],
       ],
-      attributes: [
-        'id',
-        'experience',
-        'level',
-        'upgrade',
-        'minHp',
-        [
-          Sequelize.literal('COALESCE(min_hp, 0) * COALESCE(level, 0)'),
-          'maxHp',
-        ],
-        'slot',
-        'userId',
-        'characterId',
-        [Sequelize.col('created_at'), 'createdAt'],
-        [Sequelize.col('updated_at'), 'updatedAt'],
-      ],
       include: [
         {
           model: CharacterModel,
           as: 'character',
+        },
+        {
+          model: CharacterSkillModel,
+          as: 'skills',
+          include: [
+            {
+              model: SkillModel,
+              as: 'skill',
+            },
+          ],
         },
       ],
     });
@@ -68,26 +63,20 @@ export default class UserCharacterService {
         id: id,
         userId: userId,
       },
-      attributes: [
-        'id',
-        'experience',
-        'level',
-        'upgrade',
-        'minHp',
-        [
-          Sequelize.literal('COALESCE(min_hp, 0) * COALESCE(level, 0)'),
-          'maxHp',
-        ],
-        'slot',
-        'userId',
-        'characterId',
-        [Sequelize.col('created_at'), 'createdAt'],
-        [Sequelize.col('updated_at'), 'updatedAt'],
-      ],
       include: [
         {
           model: CharacterModel,
           as: 'character',
+        },
+        {
+          model: CharacterSkillModel,
+          as: 'skills',
+          include: [
+            {
+              model: SkillModel,
+              as: 'skill',
+            },
+          ],
         },
       ],
     });

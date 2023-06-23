@@ -1,4 +1,5 @@
 import CharacterModel from './characterModel';
+import CharacterSkillModel from './characterSkillModel';
 import UserModel from './userModel';
 import { DataTypes, HasOneGetAssociationMixin, Model } from 'sequelize';
 import { sequelize } from './sequelize';
@@ -69,6 +70,12 @@ UserCharacterModel.init(
       },
       field: 'character_id',
     },
+    maxHp: {
+      type: new DataTypes.VIRTUAL(DataTypes.INTEGER, ['minHp']),
+      get: function () {
+        return this.get('minHp') * this.get('level');
+      },
+    },
   },
   {
     sequelize,
@@ -82,4 +89,9 @@ UserCharacterModel.init(
 UserCharacterModel.belongsTo(CharacterModel, {
   as: 'character',
   foreignKey: 'characterId',
+});
+
+UserCharacterModel.hasMany(CharacterSkillModel, {
+  as: 'skills',
+  foreignKey: 'userCharacterId',
 });

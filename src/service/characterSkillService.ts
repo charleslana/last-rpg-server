@@ -34,7 +34,6 @@ export default class CharacterSkillService {
         userCharacterId: userCharacterId,
       },
       order: [['id', 'DESC']],
-      attributes: [],
       include: [
         {
           model: SkillModel,
@@ -53,7 +52,6 @@ export default class CharacterSkillService {
       where: {
         userCharacterId: userCharacterId,
       },
-      attributes: [],
       include: [
         {
           model: SkillModel,
